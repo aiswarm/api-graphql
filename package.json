@@ -14,7 +14,13 @@
   "author": "Ravi Gairola <mallox@pyxzl.net",
   "license": "MIT",
   "dependencies": {
-    "apollo-server": "^3.13.0"
+    "@graphql-tools/schema": "^10.0.0",
+    "apollo-server-express": "^3.13.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "graphql": "^16.8.1",
+    "graphql-subscriptions": "^2.0.0",
+    "subscriptions-transport-ws": "^0.11.0"
   },
   "devDependencies": {
     "jest": "^27.0.6"
