@@ -19,17 +19,36 @@ export function initialize(api) {
   const typeDefs = gql`
       type Query {
           agents: [Agent]
+          drivers: [Driver]
       }
       type Agent {
           name: String
-          driver: String
+          driver: Driver
+      }
+      type Driver {
+          type: String
       }
   `;
 
   const resolvers = {
     Query: {
       agents: (parent, args, context) => {
-        return context.api.agentMan.getAgents()
+        const response = []
+        const agentMap = context.api.agentMan.getAgents()
+        for (let agentName in agentMap) {
+          const agent = agentMap[agentName]
+          response.push(agent)
+        }
+        return response
+      },
+      drivers: (parent, args, context) => {
+        const response = new Set()
+        const agentMap = context.api.agentMan.getAgents()
+        for (let agentName in agentMap) {
+          const agent = agentMap[agentName]
+          response.add(agent.driver)
+        }
+        return response.values()
       }
     }
   };
@@ -38,7 +57,7 @@ export function initialize(api) {
   const server = new ApolloServer({typeDefs, resolvers, context: {api}});
 
   server.listen().then(({url}) => {
-    api.log.info(`Server ready at`, url);
+    api.log.info(`GraphQL API ready at`, url);
   });
 }
 
