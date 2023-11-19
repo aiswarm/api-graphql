@@ -2,15 +2,12 @@
  * This is the entry point for the GraphQL API plugin. Here we specify the GraphQL schema and resolvers.
  */
 
-import express from 'express';
-import cors from 'cors';
-import {ApolloServer, gql} from 'apollo-server-express';
-import {createServer} from 'http';
-import {execute, subscribe} from 'graphql';
-import {SubscriptionServer} from 'subscriptions-transport-ws';
-import {PubSub} from 'graphql-subscriptions';
-import {makeExecutableSchema} from '@graphql-tools/schema';
-
+import Fastify from "fastify";
+import mercurius from "mercurius";
+import {gql} from "graphql-tag";
+import cors from "@fastify/cors";
+import {makeExecutableSchema} from "@graphql-tools/schema";
+import {PubSub} from "graphql-subscriptions";
 
 /**
  * @typedef {Object} GraphQLConfig
@@ -27,138 +24,137 @@ export async function initialize(api) {
   const pubSub = new PubSub();
 
   if (config.disabled) {
-    api.log.info('GraphQL API is disabled');
-    return
+    api.log.info("GraphQL API is disabled");
+    return;
   }
 
-  let id = 1
-  let messages = []
+  let id = 1;
+  let messages = [];
 
   const typeDefs = gql`
-      type Query {
-          agents: [Agent]
-          drivers: [Driver]
-          groups: [Group]
-          messages: [Message]
-      }
-      type Agent {
-          name: String
-          driver: Driver
-      }
-      type Driver {
-          type: String
-      }
-      type Group {
-          name: String
-      }
-      type Message {
-          id: Int
-          type: String
-          content: String
-      }
+    type Query {
+      agents: [Agent]
+      drivers: [Driver]
+      groups: [Group]
+      messages: [Message]
+    }
+    type Agent {
+      name: String
+      driver: Driver
+    }
+    type Driver {
+      type: String
+    }
+    type Group {
+      name: String
+    }
+    type Message {
+      id: Int
+      type: String
+      content: String
+    }
 
-      type Mutation {
-          sendMessage(message: String!): Message
-      }
+    type Mutation {
+      sendMessage(message: String!): Message
+    }
 
-      type Subscription {
-          messageSent: Message
-      }
+    type Subscription {
+      messageSent: Message
+    }
   `;
 
   const resolvers = {
     Query: {
       agents: (parent, args, context) => {
-        const response = []
-        const agentMap = context.api.agentMan.getAgents()
+        context.api.log.trace("GraphQL Received Request for Agents", args);
+        const response = [];
+        const agentMap = context.api.agentMan.getAgents();
         for (let agentName in agentMap) {
-          const agent = agentMap[agentName]
-          response.push(agent)
+          const agent = agentMap[agentName];
+          response.push(agent);
         }
-        return response
+        return response;
       },
       drivers: (parent, args, context) => {
-        const response = new Set()
-        const agentMap = context.api.agentMan.getAgents()
+        context.api.log.trace("GraphQL Received Request for Drivers", args);
+        const response = new Set();
+        const agentMap = context.api.agentMan.getAgents();
         for (let agentName in agentMap) {
-          const agent = agentMap[agentName]
-          response.add(agent.driver)
+          const agent = agentMap[agentName];
+          response.add(agent.driver);
         }
-        return response.values()
+        return response.values();
       },
       groups: (parent, args, context) => {
-        const response = new Set()
-        const groups = context.api.config.groups
-        let i = 1
+        context.api.log.trace("GraphQL Received Request for Groups", args);
+        const response = new Set();
+        const groups = context.api.config.groups;
+        let i = 1;
         for (let groupName in groups) {
           response.add({
             name: groupName,
-            members: groups[groupName]
-          })
+            members: groups[groupName],
+          });
         }
-        return response.values()
+        return response.values();
       },
       messages: (parent, args, context) => {
-        return messages
+        return messages;
       },
     },
     Mutation: {
       sendMessage: (parent, args, context) => {
-        api.log.trace('GraphQL Received Message:', args)
-        const message = {id: id++, type: 'string', content: args.message ?? ''}
-        messages.push(message)
-        pubSub.publish('MESSAGE_SENT', {messageSent: message})
-        return message
+        context.api.log.trace("GraphQL Received Message:", args);
+        const message = {
+          id: id++,
+          type: "string",
+          content: args.message ?? "",
+        };
+        messages.push(message);
+        context.pubSub.publish("MESSAGE_SENT", { messageSent: message });
+        return message;
       },
     },
     Subscription: {
       messageSent: {
-        subscribe: () => pubSub.asyncIterator(['MESSAGE_SENT']),
+        subscribe: () => pubSub.asyncIterator(["MESSAGE_SENT"]),
       },
     },
   };
 
+  const app = Fastify();
+  app.register(cors);
   const schema = makeExecutableSchema({
     typeDefs,
     resolvers,
   });
 
-  const app = express();
-
-  app.use(cors());
-
-  const apolloServer = new ApolloServer({
+  app.register(mercurius, {
     schema,
-    context: {api, pubsub: pubSub}, // Pass the PubSub instance to the context
+    context: (request, reply) => {
+      return { api, pubSub: pubSub };
+    },
+    subscription: true,
   });
 
-  const port = config.port ?? 4000
-
-  const httpServer = createServer(app);
-
-  await apolloServer.start()
-  apolloServer.applyMiddleware({app, path: '/graphql'});
-
-  httpServer.listen(port, () => {
-    console.log(`GraphQL Server ready at http://localhost:${port}${apolloServer.graphqlPath}`);
-    console.log(`GraphQL Subscriptions ready at ws://localhost:${port}${apolloServer.graphqlPath}`);
-  });
-
-  SubscriptionServer.create({
-    execute,
-    subscribe,
-    schema,
-  }, {
-    server: httpServer,
-    path: '/graphql',
+  // Start the server
+  app.listen({ port: config.port || 4000 }, (err, address) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+    console.log(`GraphQL endpoint available at ${address}`);
   });
 
   let randomId = 1;
   setInterval(() => {
-    const message = {id: id++, type: 'string', content: `Random message ${randomId++}`};
+    const message = {
+      id: id++,
+      type: "string",
+      content: `Random message ${randomId++}`,
+    };
     messages.push(message);
-    console.log('Publishing message:', message);
-    pubSub.publish('MESSAGE_SENT', {messageSent: message});
+    console.log("Publishing message:", message);
+    pubSub.publish("MESSAGE_SENT", { messageSent: message });
   }, 5000);
 }
-
