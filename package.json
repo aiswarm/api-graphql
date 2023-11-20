@@ -22,6 +22,10 @@
     "mercurius": "^13.3.0"
   },
   "devDependencies": {
-    "jest": "^27.0.6"
+    "@babel/eslint-parser": "^7.23.3",
+    "@babel/core": "^7.23.3",
+    "babel-jest": "^29.7.0",
+    "eslint": "^8.54.0",
+    "jest": "^29.7.0"
   }
 }

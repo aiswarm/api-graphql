@@ -40,7 +40,7 @@ export const resolvers = {
     agents: (parent, args, context) => {
       context.api.log.trace('GraphQL Received Request for Agents', args)
       const response = []
-      const agentMap = context.api.agentMan.getAgents()
+      const agentMap = context.api.agents.all()
       for (let agentName in agentMap) {
         const agent = agentMap[agentName]
         response.push(agent)
@@ -50,7 +50,7 @@ export const resolvers = {
     drivers: (parent, args, context) => {
       context.api.log.trace('GraphQL Received Request for Drivers', args)
       const response = new Set()
-      const agentMap = context.api.agentMan.getAgents()
+      const agentMap = context.api.agents.all()
       for (let agentName in agentMap) {
         const agent = agentMap[agentName]
         response.add(agent.driver)
