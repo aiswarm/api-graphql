@@ -51,7 +51,7 @@ export async function initialize(api) {
   app.listen({ port: config.port || 4000 }, (err, address) => {
     if (err) {
       console.error(err)
-      process.exit(1)
+      throw new Error(err)
     }
     console.log(`GraphQL endpoint available at ${address}`)
   })
