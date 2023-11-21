@@ -37,11 +37,11 @@ export async function initialize(api) {
 
   app.register(mercurius, {
     schema,
-    context: (request, reply) => {
+    context: () => {
       return { api, pubSub: pubSub }
     },
     subscription: {
-      onConnect: (connectionParams, webSocket, context) => {
+      onConnect: () => {
         return { api, pubSub: pubSub }
       },
     },
@@ -57,8 +57,32 @@ export async function initialize(api) {
   })
 
   api.comms.on('all', (msg) => {
+    api.log.trace(
+      'Received message from system, sending to GraphQL subs',
+      msg.toObject()
+    )
     pubSub.publish('MESSAGE_SENT', {
       messageSent: msg.toObject(),
+    })
+  })
+
+  api.on('groupCreated', (group) => {
+    api.log.debug(
+      'Received groupCreated event from system, sending to GraphQL subs',
+      group
+    )
+    pubSub.publish('GROUP_CREATED', {
+      groupCreated: group,
+    })
+  })
+
+  api.on('agentCreated', (agent) => {
+    api.log.debug(
+      'Received agentCreated event from system, sending to GraphQL subs',
+      agent
+    )
+    pubSub.publish('AGENT_CREATED', {
+      agentCreated: agent,
     })
   })
 }

@@ -8,30 +8,45 @@ export const typeDefs = gql`
     messages: [Message]
   }
   type Agent {
-    name: String
-    driver: Driver
+    name: String!
+    config: AgentConfig!
+    driver: Driver!
+  }
+  type AgentConfig {
+    type: String!
+    description: String
+    creator: Boolean
+    isolate: Boolean
+    driver: DriverConfig!
+  }
+  type DriverConfig {
+    type: String!
   }
   type Driver {
-    type: String
+    type: String!
   }
   type Group {
-    name: String
+    name: String!
   }
   type Message {
     id: Float
     type: String
     source: String
-    target: String
+    target: String!
     timestamp: String
-    content: String
+    content: String!
   }
 
   type Mutation {
     sendMessage(message: String!, target: String!): Message
+    createGroup(name: String!): String
+    createAgent(name: String!, driver: String!): Agent
   }
 
   type Subscription {
     messageSent: Message
+    groupCreated: String
+    agentCreated: Agent
   }
 `
 
@@ -86,11 +101,38 @@ export const resolvers = {
       context.api.comms.emit(msg)
       return msg
     },
+    createGroup: (parent, args, context) => {
+      context.api.log.trace('GraphQL Received Request to create Group', args)
+      context.api.createGroup(args.name)
+      return args.name
+    },
+    createAgent: (parent, args, context) => {
+      context.api.log.trace('GraphQL Received Request to create Agent', args)
+
+      return context.api.createAgent(args.name, {
+        description: 'Created by GraphQL',
+        creator: false,
+        isolate: false,
+        driver: {
+          type: args.driver,
+        },
+      })
+    },
   },
   Subscription: {
     messageSent: {
       subscribe: (_, __, { pubSub }) => {
         return pubSub.asyncIterator(['MESSAGE_SENT'])
+      },
+    },
+    groupCreated: {
+      subscribe: (_, __, { pubSub }) => {
+        return pubSub.asyncIterator(['GROUP_CREATED'])
+      },
+    },
+    agentCreated: {
+      subscribe: (_, __, { pubSub }) => {
+        return pubSub.asyncIterator(['AGENT_CREATED'])
       },
     },
   },
