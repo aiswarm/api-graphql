@@ -5,7 +5,7 @@ export const typeDefs = gql`
     agents: [Agent]
     drivers: [Driver]
     groups: [Group]
-    messages: [Message]
+    history(target: String, source: String): [Message]!
   }
   type Agent {
     name: String!
@@ -27,25 +27,27 @@ export const typeDefs = gql`
   }
   type Group {
     name: String!
+    members: [String]
   }
   type Message {
     id: Float
-    type: String
     source: String
     target: String!
     timestamp: String
     content: String!
+    type: String!
   }
 
   type Mutation {
-    sendMessage(message: String!, target: String!): Message
+    sendMessage(message: String!, target: String!, source: String): Message
     createGroup(name: String!): String
     createAgent(name: String!, driver: String!): Agent
   }
 
   type Subscription {
-    messageSent: Message
-    groupCreated: String
+    messageCreated: Message
+    groupCreated: Group
+    groupUpdated: Group
     agentCreated: Agent
   }
 `
@@ -75,9 +77,9 @@ export const resolvers = {
     groups: (parent, args, context) => {
       context.api.log.trace('GraphQL Received Request for Groups', args)
       const response = new Set()
-      const groups = context.api.config.groups
+      const groups = context.api.groups.all()
       let i = 1
-      for (let groupName in groups) {
+      for (const groupName in groups) {
         response.add({
           name: groupName,
           members: groups[groupName],
@@ -85,9 +87,14 @@ export const resolvers = {
       }
       return response.values()
     },
-    messages: (parent, args, context) => {
-      // TODO get group/agent from args and return their history
-      return context.api.comms.history
+    history: (parent, args, context) => {
+      console.log('GraphQL Received Request for History', args)
+      if (!args.target) return context.api.comms.history.all()
+      const sourceHistory = context.api.comms.history.bySource(args.source)
+      const targetHistory = context.api.comms.history.byTarget(args.target)
+      return [...sourceHistory, ...targetHistory]
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .map((msg) => msg.toObject())
     },
   },
   Mutation: {
@@ -95,19 +102,19 @@ export const resolvers = {
       context.api.log.trace('GraphQL Received Message:', args)
       const msg = context.api.comms.createMessage(
         args.target,
-        'user',
+        args.source || 'user',
         args.message
       )
       context.api.comms.emit(msg)
-      return msg
+      return msg.toObject()
     },
     createGroup: (parent, args, context) => {
-      context.api.log.trace('GraphQL Received Request to create Group', args)
+      context.api.log.trace('GraphQL Received Request to add Group', args)
       context.api.createGroup(args.name)
       return args.name
     },
     createAgent: (parent, args, context) => {
-      context.api.log.trace('GraphQL Received Request to create Agent', args)
+      context.api.log.trace('GraphQL Received Request to add Agent', args)
 
       return context.api.createAgent(args.name, {
         description: 'Created by GraphQL',
@@ -120,7 +127,7 @@ export const resolvers = {
     },
   },
   Subscription: {
-    messageSent: {
+    messageCreated: {
       subscribe: (_, __, { pubSub }) => {
         return pubSub.asyncIterator(['MESSAGE_SENT'])
       },
@@ -128,6 +135,11 @@ export const resolvers = {
     groupCreated: {
       subscribe: (_, __, { pubSub }) => {
         return pubSub.asyncIterator(['GROUP_CREATED'])
+      },
+    },
+    groupUpdated: {
+      subscribe: (_, __, { pubSub }) => {
+        return pubSub.asyncIterator(['GROUP_UPDATED'])
       },
     },
     agentCreated: {
