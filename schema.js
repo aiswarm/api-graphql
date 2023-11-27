@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag'
+import {gql} from 'graphql-tag'
 
 export const typeDefs = gql`
   type Query {
@@ -77,25 +77,24 @@ export const resolvers = {
     groups: (parent, args, context) => {
       context.api.log.trace('GraphQL Received Request for Groups', args)
       const response = new Set()
-      const groups = context.api.groups.all()
-      let i = 1
+      const groups = context.api.groups.map()
       for (const groupName in groups) {
         response.add({
           name: groupName,
-          members: groups[groupName],
+          members: groups[groupName]
         })
       }
       return response.values()
     },
     history: (parent, args, context) => {
-      console.log('GraphQL Received Request for History', args)
+      context.api.log.trace('GraphQL Received Request for History', args)
       if (!args.target) return context.api.comms.history.all()
       const sourceHistory = context.api.comms.history.bySource(args.source)
       const targetHistory = context.api.comms.history.byTarget(args.target)
       return [...sourceHistory, ...targetHistory]
         .sort((a, b) => a.timestamp - b.timestamp)
         .map((msg) => msg.toObject())
-    },
+    }
   },
   Mutation: {
     sendMessage: (parent, args, context) => {
@@ -121,31 +120,31 @@ export const resolvers = {
         creator: false,
         isolate: false,
         driver: {
-          type: args.driver,
-        },
+          type: args.driver
+        }
       })
-    },
+    }
   },
   Subscription: {
     messageCreated: {
-      subscribe: (_, __, { pubSub }) => {
+      subscribe: (_, __, {pubSub}) => {
         return pubSub.asyncIterator(['MESSAGE_SENT'])
-      },
+      }
     },
     groupCreated: {
-      subscribe: (_, __, { pubSub }) => {
+      subscribe: (_, __, {pubSub}) => {
         return pubSub.asyncIterator(['GROUP_CREATED'])
-      },
+      }
     },
     groupUpdated: {
-      subscribe: (_, __, { pubSub }) => {
+      subscribe: (_, __, {pubSub}) => {
         return pubSub.asyncIterator(['GROUP_UPDATED'])
-      },
+      }
     },
     agentCreated: {
-      subscribe: (_, __, { pubSub }) => {
+      subscribe: (_, __, {pubSub}) => {
         return pubSub.asyncIterator(['AGENT_CREATED'])
-      },
-    },
-  },
+      }
+    }
+  }
 }
