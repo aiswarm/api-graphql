@@ -2,12 +2,19 @@
  * This is the entry point for the GraphQL API plugin. Here we specify the GraphQL schema and resolvers.
  */
 
+import fs from 'fs'
+import path from 'path'
+import {fileURLToPath} from 'url'
+
 import Fastify from 'fastify'
-import mercurius from 'mercurius'
 import cors from '@fastify/cors'
+import mercurius from 'mercurius'
 import {makeExecutableSchema} from '@graphql-tools/schema'
 import {PubSub} from 'graphql-subscriptions'
-import {resolvers, typeDefs} from './schema.js'
+import {gql} from 'graphql-tag'
+
+import resolvers from './resolvers.js'
+
 /**
  * @typedef {Object} GraphQLConfig
  * @property {boolean} [disabled=false] Whether the GraphQL API is disabled.
@@ -32,6 +39,11 @@ export async function initialize(api) {
     api.log.info('GraphQL API is disabled')
     return
   }
+
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = path.dirname(__filename)
+  const schemaPath = path.join(__dirname, 'schema.graphql')
+  const typeDefs = gql(fs.readFileSync(schemaPath, 'utf8'))
 
   const app = Fastify()
   app.register(cors)
