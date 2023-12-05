@@ -28,10 +28,15 @@ const Query = {
   },
   history: (parent, args, context) => {
     context.api.log.trace('GraphQL Received Request for History', args)
-    if (!args.target) return context.api.comms.history.all()
-    const sourceHistory = context.api.comms.history.bySource(args.source)
-    const targetHistory = context.api.comms.history.byTarget(args.target)
-    return [...sourceHistory, ...targetHistory]
+    let messages
+    if (!args.source && !args.target) {
+      messages = context.api.comms.history.all()
+    } else {
+      const sourceHistory = context.api.comms.history.bySource(args.source)
+      const targetHistory = context.api.comms.history.byTarget(args.target)
+      messages = [...sourceHistory, ...targetHistory]
+    }
+    return messages
     .sort((a, b) => a.timestamp - b.timestamp)
     .map((msg) => msg.toObject())
   }
