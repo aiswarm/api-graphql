@@ -43,7 +43,7 @@ export async function initialize(api) {
   const __filename = fileURLToPath(import.meta.url)
   const __dirname = path.dirname(__filename)
   const schemaPath = path.join(__dirname, 'schema.graphql')
-  const typeDefs = gql(fs.readFileSync(schemaPath, 'utf8'))
+  const typeDefs = gql(await fs.promises.readFile(schemaPath, 'utf8'))
 
   const app = Fastify()
   app.register(cors)
@@ -67,8 +67,8 @@ export async function initialize(api) {
   // Start the server
   app.listen({port: config.port || 4000}, (err, address) => {
     if (err) {
-      api.log.error(err)
-      throw new Error(err)
+      api.log.error(err.message)
+      throw new Error(err.message)
     }
     api.log.info(`GraphQL endpoint available at ${address}`)
   })
