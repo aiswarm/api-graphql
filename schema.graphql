@@ -1,55 +1,55 @@
 type Query {
-    agents: [Agent]
-    drivers: [Driver]
-    groups: [Group]
-    history(target: String, source: String): [Message]!
+  agents: [Agent]
+  drivers: [Driver]
+  groups: [Group]
+  history(target: String, source: String): [Message]!
 }
 
 type Agent {
-    name: String!
-    config: AgentConfig!
-    driver: Driver!
+  name: String!
+  config: AgentConfig!
+  driver: Driver!
 }
 
 type AgentConfig {
-    type: String!
-    description: String
-    creator: Boolean
-    isolate: Boolean
-    driver: DriverConfig!
+  type: String!
+  description: String
+  creator: Boolean
+  isolate: Boolean
+  driver: DriverConfig!
 }
 
 type DriverConfig {
-    type: String!
+  type: String!
 }
 
 type Driver {
-    type: String!
+  type: String!
 }
 
 type Group {
-    name: String!
-    members: [String]
+  name: String!
+  members: [String]
 }
 
 type Message {
-    id: Float
-    source: String
-    target: String!
-    timestamp: String
-    content: String!
-    type: String!
+  id: Float
+  source: String
+  target: String!
+  timestamp: String
+  content: String!
+  type: String!
 }
 
 type Mutation {
-    sendMessage(message: String!, target: String!, source: String): Message
-    createGroup(name: String!): String
-    createAgent(name: String!, driver: String!): Agent
+  sendMessage(message: String!, target: String!, source: String): Message
+  createGroup(name: String!): String
+  createAgent(name: String!, driver: String!): Agent
 }
 
 type Subscription {
-    messageCreated: Message
-    groupCreated: Group
-    groupUpdated: Group
-    agentCreated: Agent
+  messageCreated: Message
+  groupCreated: Group
+  groupUpdated: Group
+  agentCreated: Agent
 }

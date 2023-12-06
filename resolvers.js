@@ -37,8 +37,8 @@ const Query = {
       messages = [...sourceHistory, ...targetHistory]
     }
     return messages
-    .sort((a, b) => a.timestamp - b.timestamp)
-    .map((msg) => msg.toObject())
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .map((msg) => msg.toObject())
   }
 }
 
