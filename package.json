@@ -4,9 +4,7 @@
   "description": "",
   "main": "index.js",
   "type": "module",
-  "keywords": [
-    "ai_so:plugin"
-  ],
+  "keywords": [ "@aiswarm:plugin" ],
   "scripts": {
     "start": "echo \"No start script\" && exit 1",
     "test": "jest --coverage test/"
