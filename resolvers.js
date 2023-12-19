@@ -63,8 +63,6 @@ const Mutation = {
 
     return context.api.createAgent(args.name, {
       description: 'Created by GraphQL',
-      creator: false,
-      isolate: false,
       driver: {
         type: args.driver
       }
@@ -76,6 +74,11 @@ const Subscription = {
   messageCreated: {
     subscribe: (_, __, {pubSub}) => {
       return pubSub.asyncIterator(['MESSAGE_SENT'])
+    }
+  },
+  messageUpdated: {
+    subscribe: (_, __, {pubSub}) => {
+      return pubSub.asyncIterator(['MESSAGE_UPDATED'])
     }
   },
   groupCreated: {
@@ -91,6 +94,11 @@ const Subscription = {
   agentCreated: {
     subscribe: (_, __, {pubSub}) => {
       return pubSub.asyncIterator(['AGENT_CREATED'])
+    }
+  },
+  agentUpdated: {
+    subscribe: (_, __, {pubSub}) => {
+      return pubSub.asyncIterator(['AGENT_UPDATED'])
     }
   }
 }

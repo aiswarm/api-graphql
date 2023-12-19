@@ -83,6 +83,16 @@ export async function initialize(api) {
     })
   })
 
+  api.on('messageUpdated', (msg) => {
+    api.log.trace(
+      'Received messageUpdated from system, sending to GraphQL subs',
+      msg.toObject()
+    )
+    pubSub.publish('MESSAGE_UPDATED', {
+      messageUpdated: msg.toObject()
+    })
+  })
+
   api.groups.on('created', (name, members) => {
     api.log.debug(
       'Received groupCreated event from system, sending to GraphQL subs',
@@ -93,7 +103,7 @@ export async function initialize(api) {
     })
   })
 
-  api.on('updated', (name, members) => {
+  api.groups.on('updated', (name, members) => {
     api.log.debug(
       'Received groupUpdated event from system, sending to GraphQL subs',
       name
@@ -110,6 +120,16 @@ export async function initialize(api) {
     )
     pubSub.publish('AGENT_CREATED', {
       agentCreated: agent
+    })
+  })
+
+  api.on('agentUpdated', (agent) => {
+    api.log.debug(
+      'Received agentUpdated event from system, sending to GraphQL subs',
+      agent
+    )
+    pubSub.publish('AGENT_UPDATED', {
+      agentUpdated: agent
     })
   })
 }

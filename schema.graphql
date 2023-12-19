@@ -9,14 +9,15 @@ type Agent {
   name: String!
   config: AgentConfig!
   driver: Driver!
+  status: String!
 }
 
 type AgentConfig {
   type: String!
+  instructions: String
   description: String
-  creator: Boolean
-  isolate: Boolean
   driver: DriverConfig!
+  skills: [String]
 }
 
 type DriverConfig {
@@ -39,6 +40,7 @@ type Message {
   timestamp: String
   content: String!
   type: String!
+  status: String!
 }
 
 type Mutation {
@@ -49,7 +51,9 @@ type Mutation {
 
 type Subscription {
   messageCreated: Message
+  messageUpdated: Message
   groupCreated: Group
   groupUpdated: Group
   agentCreated: Agent
+  agentUpdated: Agent
 }
