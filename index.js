@@ -74,7 +74,7 @@ export async function initialize(api) {
   })
 
   api.comms.on('all', (msg) => {
-    api.log.trace(
+    api.log.debug(
       'Received messageInput from system, sending to GraphQL subs',
       msg.toObject()
     )
@@ -83,8 +83,8 @@ export async function initialize(api) {
     })
   })
 
-  api.on('messageUpdated', (msg) => {
-    api.log.trace(
+  api.comms.on('messageUpdated', (msg) => {
+    api.log.debug(
       'Received messageUpdated from system, sending to GraphQL subs',
       msg.toObject()
     )

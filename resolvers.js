@@ -39,6 +39,15 @@ const Query = {
     return messages
       .sort((a, b) => a.timestamp - b.timestamp)
       .map((msg) => msg.toObject())
+  },
+  skills: (parent, args, context) => {
+    const response = []
+    for (const skill of context.api.skills.list()) {
+      response.push({
+        name: skill
+      })
+    }
+    return response
   }
 }
 
@@ -50,6 +59,7 @@ const Mutation = {
       args.source || 'user',
       args.message
     )
+    msg.status = 'sent'
     context.api.comms.emit(msg)
     return msg.toObject()
   },
@@ -62,10 +72,12 @@ const Mutation = {
     context.api.log.trace('GraphQL Received Request to add Agent', args)
 
     return context.api.createAgent(args.name, {
-      description: 'Created by GraphQL',
+      description: args.description,
       driver: {
         type: args.driver
-      }
+      },
+      instructions: args.instructions,
+      skills: args.skills
     })
   }
 }

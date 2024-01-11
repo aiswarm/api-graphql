@@ -3,6 +3,11 @@ type Query {
   drivers: [Driver]
   groups: [Group]
   history(target: String, source: String): [Message]!
+  skills: [Skill]
+}
+
+type Skill {
+  name: String!
 }
 
 type Agent {
@@ -46,7 +51,7 @@ type Message {
 type Mutation {
   sendMessage(message: String!, target: String!, source: String): Message
   createGroup(name: String!): String
-  createAgent(name: String!, driver: String!): Agent
+  createAgent(name: String!, driver: String!, description: String, instructions: String, skills: [String]): Agent
 }
 
 type Subscription {
