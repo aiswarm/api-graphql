@@ -83,7 +83,7 @@ export async function initialize(api) {
     })
   })
 
-  api.comms.on('messageUpdated', (msg) => {
+  api.on('messageUpdated', (msg) => {
     api.log.debug(
       'Received messageUpdated from system, sending to GraphQL subs',
       msg.toObject()
