@@ -48,6 +48,14 @@ type Message {
   status: String!
 }
 
+# Consider: adding a ststus field and combine skill subscriptions into one
+type SkillStatus {
+  status: String!
+  agent: String!
+  skill: String!
+  data: String
+}
+
 type Mutation {
   sendMessage(message: String!, target: String!, source: String): Message
   createGroup(name: String!): String
@@ -61,4 +69,5 @@ type Subscription {
   groupUpdated: Group
   agentCreated: Agent
   agentUpdated: Agent
+  skillStatus: SkillStatus
 }

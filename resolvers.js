@@ -70,7 +70,6 @@ const Mutation = {
   },
   createAgent: (parent, args, context) => {
     context.api.log.trace('GraphQL Received Request to add Agent', args)
-
     return context.api.createAgent(args.name, {
       description: args.description,
       driver: {
@@ -111,6 +110,11 @@ const Subscription = {
   agentUpdated: {
     subscribe: (_, __, {pubSub}) => {
       return pubSub.asyncIterator(['AGENT_UPDATED'])
+    }
+  },
+  skillStatus: {
+    subscribe: (_, __, {pubSub}) => {
+      return pubSub.asyncIterator(['SKILL_STATUS'])
     }
   }
 }

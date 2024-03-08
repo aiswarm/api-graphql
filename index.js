@@ -55,11 +55,11 @@ export async function initialize(api) {
   app.register(mercurius, {
     schema,
     context: () => {
-      return {api, pubSub: pubSub}
+      return { api, pubSub: pubSub }
     },
     subscription: {
       onConnect: () => {
-        return {api, pubSub: pubSub}
+        return { api, pubSub: pubSub }
       }
     }
   })
@@ -99,7 +99,7 @@ export async function initialize(api) {
       name
     )
     pubSub.publish('GROUP_CREATED', {
-      groupCreated: {name, members}
+      groupCreated: { name, members }
     })
   })
 
@@ -109,7 +109,7 @@ export async function initialize(api) {
       name
     )
     pubSub.publish('GROUP_UPDATED', {
-      groupUpdated: {name, members}
+      groupUpdated: { name, members }
     })
   })
 
@@ -130,6 +130,13 @@ export async function initialize(api) {
     )
     pubSub.publish('AGENT_UPDATED', {
       agentUpdated: agent
+    })
+  })
+
+  api.skills.any(['skillStarted', 'skillCompleted', 'skillNotFound', 'skillError'], (event, ...args) => {
+    api.log.debug('Received a skill status event from system, sending to GraphQL subs', event, args)
+    pubSub.publish('SKILL_STATUS', {
+      skillStatus: { status:event, agent:args[0], skill:args[1], data: JSON.stringify(args[2]) }
     })
   })
 }
