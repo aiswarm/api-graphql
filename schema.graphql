@@ -46,6 +46,12 @@ type Message {
   content: String!
   type: String!
   status: String!
+  metadata: [Metadata]
+}
+
+type Metadata {
+  key: String!
+  value: String
 }
 
 # Consider: adding a ststus field and combine skill subscriptions into one
