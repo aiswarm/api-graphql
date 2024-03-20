@@ -74,7 +74,7 @@ export async function initialize(api) {
   })
 
   api.comms.on('all', (msg) => {
-    api.log.debug(
+    api.log.trace(
       'Received messageInput from system, sending to GraphQL subs',
       msg.toObject()
     )
@@ -84,7 +84,7 @@ export async function initialize(api) {
   })
 
   api.on('messageUpdated', (msg) => {
-    api.log.debug(
+    api.log.trace(
       'Received messageUpdated from system, sending to GraphQL subs',
       msg.toObject()
     )
@@ -94,7 +94,7 @@ export async function initialize(api) {
   })
 
   api.groups.on('created', (name, members) => {
-    api.log.debug(
+    api.log.trace(
       'Received groupCreated event from system, sending to GraphQL subs',
       name
     )
@@ -104,7 +104,7 @@ export async function initialize(api) {
   })
 
   api.groups.on('updated', (name, members) => {
-    api.log.debug(
+    api.log.trace(
       'Received groupUpdated event from system, sending to GraphQL subs',
       name
     )
@@ -114,7 +114,7 @@ export async function initialize(api) {
   })
 
   api.on('agentCreated', (agent) => {
-    api.log.debug(
+    api.log.trace(
       'Received agentCreated event from system, sending to GraphQL subs',
       agent
     )
@@ -124,7 +124,7 @@ export async function initialize(api) {
   })
 
   api.on('agentUpdated', (agent) => {
-    api.log.debug(
+    api.log.trace(
       'Received agentUpdated event from system, sending to GraphQL subs',
       agent
     )
@@ -134,7 +134,7 @@ export async function initialize(api) {
   })
 
   api.skills.any(['skillStarted', 'skillCompleted', 'skillNotFound', 'skillError'], (event, ...args) => {
-    api.log.debug('Received a skill status event from system, sending to GraphQL subs', event, args)
+    api.log.trace('Received a skill status event from system, sending to GraphQL subs', event, args)
     pubSub.publish('SKILL_STATUS', {
       skillStatus: { status:event, agent:args[0], skill:args[1], data: JSON.stringify(args[2]) }
     })
