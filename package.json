@@ -22,6 +22,9 @@
     "graphql-subscriptions": "^2.0.0",
     "mercurius": "^13.3.0"
   },
+  "peerDependencies": {
+    "@aiswarm/orchestrator": "^0.1.9"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.10",
     "@babel/core": "^7.23.3",

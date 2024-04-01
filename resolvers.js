@@ -59,7 +59,6 @@ const Mutation = {
       args.source || 'user',
       args.message
     )
-    msg.status = 'sent'
     context.api.comms.emit(msg)
     return msg.toObject()
   },
