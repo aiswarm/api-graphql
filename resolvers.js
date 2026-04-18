@@ -12,7 +12,7 @@ const Query = {
   drivers: (parent, args, context) => {
     context.api.log.trace('GraphQL Received Request for Drivers', args)
     const driverNames = context.api.agents.availableDrivers()
-    return driverNames.map(name => ({type: name}))
+    return driverNames.map(name => ({ type: name }))
   },
   groups: (parent, args, context) => {
     context.api.log.trace('GraphQL Received Request for Groups', args)
@@ -36,9 +36,7 @@ const Query = {
       const targetHistory = context.api.comms.history.byTarget(args.target)
       messages = [...sourceHistory, ...targetHistory]
     }
-    return messages
-      .sort((a, b) => a.timestamp - b.timestamp)
-      .map((msg) => msg.toObject())
+    return messages.sort((a, b) => a.timestamp - b.timestamp).map(msg => msg.toObject())
   },
   skills: (parent, args, context) => {
     const response = []
@@ -54,11 +52,7 @@ const Query = {
 const Mutation = {
   sendMessage: (parent, args, context) => {
     context.api.log.trace('GraphQL Received Message:', args)
-    const msg = context.api.comms.createMessage(
-      args.target,
-      args.source || 'user',
-      args.message
-    )
+    const msg = context.api.comms.createMessage(args.target, args.source || 'user', args.message)
     context.api.comms.emit(msg)
     return msg.toObject()
   },
@@ -82,37 +76,37 @@ const Mutation = {
 
 const Subscription = {
   messageCreated: {
-    subscribe: (_, __, {pubSub}) => {
+    subscribe: (_, __, { pubSub }) => {
       return pubSub.asyncIterator(['MESSAGE_SENT'])
     }
   },
   messageUpdated: {
-    subscribe: (_, __, {pubSub}) => {
+    subscribe: (_, __, { pubSub }) => {
       return pubSub.asyncIterator(['MESSAGE_UPDATED'])
     }
   },
   groupCreated: {
-    subscribe: (_, __, {pubSub}) => {
+    subscribe: (_, __, { pubSub }) => {
       return pubSub.asyncIterator(['GROUP_CREATED'])
     }
   },
   groupUpdated: {
-    subscribe: (_, __, {pubSub}) => {
+    subscribe: (_, __, { pubSub }) => {
       return pubSub.asyncIterator(['GROUP_UPDATED'])
     }
   },
   agentCreated: {
-    subscribe: (_, __, {pubSub}) => {
+    subscribe: (_, __, { pubSub }) => {
       return pubSub.asyncIterator(['AGENT_CREATED'])
     }
   },
   agentUpdated: {
-    subscribe: (_, __, {pubSub}) => {
+    subscribe: (_, __, { pubSub }) => {
       return pubSub.asyncIterator(['AGENT_UPDATED'])
     }
   },
   skillStatus: {
-    subscribe: (_, __, {pubSub}) => {
+    subscribe: (_, __, { pubSub }) => {
       return pubSub.asyncIterator(['SKILL_STATUS'])
     }
   }

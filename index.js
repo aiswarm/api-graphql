@@ -4,15 +4,13 @@
 
 import fs from 'fs'
 import path from 'path'
-import {fileURLToPath} from 'url'
-
+import { fileURLToPath } from 'url'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import mercurius from 'mercurius'
-import {makeExecutableSchema} from '@graphql-tools/schema'
-import {PubSub} from 'graphql-subscriptions'
-import {gql} from 'graphql-tag'
-
+import { makeExecutableSchema } from '@graphql-tools/schema'
+import { PubSub } from 'graphql-subscriptions'
+import { gql } from 'graphql-tag'
 import resolvers from './resolvers.js'
 
 /**
@@ -65,7 +63,7 @@ export async function initialize(api) {
   })
 
   // Start the server
-  app.listen({port: config.port || 4000}, (err, address) => {
+  app.listen({ port: config.port || 4000 }, (err, address) => {
     if (err) {
       api.log.error(err.message)
       throw new Error(err.message)
@@ -73,70 +71,64 @@ export async function initialize(api) {
     api.log.info(`GraphQL endpoint available at ${address}`)
   })
 
-  api.comms.on('all', (msg) => {
-    api.log.trace(
-      'Received messageInput from system, sending to GraphQL subs',
-      msg.toObject()
-    )
+  api.comms.on('all', msg => {
+    api.log.trace('Received messageInput from system, sending to GraphQL subs', msg.toObject())
     pubSub.publish('MESSAGE_SENT', {
       messageCreated: msg.toObject()
     })
   })
 
-  api.on('messageUpdated', (msg) => {
-    api.log.trace(
-      'Received messageUpdated from system, sending to GraphQL subs',
-      msg.toObject()
-    )
+  api.on('messageUpdated', msg => {
+    api.log.trace('Received messageUpdated from system, sending to GraphQL subs', msg.toObject())
     pubSub.publish('MESSAGE_UPDATED', {
       messageUpdated: msg.toObject()
     })
   })
 
   api.groups.on('created', (name, members) => {
-    api.log.trace(
-      'Received groupCreated event from system, sending to GraphQL subs',
-      name
-    )
+    api.log.trace('Received groupCreated event from system, sending to GraphQL subs', name)
     pubSub.publish('GROUP_CREATED', {
       groupCreated: { name, members }
     })
   })
 
   api.groups.on('updated', (name, members) => {
-    api.log.trace(
-      'Received groupUpdated event from system, sending to GraphQL subs',
-      name
-    )
+    api.log.trace('Received groupUpdated event from system, sending to GraphQL subs', name)
     pubSub.publish('GROUP_UPDATED', {
       groupUpdated: { name, members }
     })
   })
 
-  api.on('agentCreated', (agent) => {
-    api.log.trace(
-      'Received agentCreated event from system, sending to GraphQL subs',
-      agent
-    )
+  api.on('agentCreated', agent => {
+    api.log.trace('Received agentCreated event from system, sending to GraphQL subs', agent)
     pubSub.publish('AGENT_CREATED', {
       agentCreated: agent
     })
   })
 
-  api.on('agentUpdated', (agent) => {
-    api.log.trace(
-      'Received agentUpdated event from system, sending to GraphQL subs',
-      agent
-    )
+  api.on('agentUpdated', agent => {
+    api.log.trace('Received agentUpdated event from system, sending to GraphQL subs', agent)
     pubSub.publish('AGENT_UPDATED', {
       agentUpdated: agent
     })
   })
 
-  api.skills.any(['skillStarted', 'skillCompleted', 'skillNotFound', 'skillError'], (event, ...args) => {
-    api.log.trace('Received a skill status event from system, sending to GraphQL subs', event, args)
-    pubSub.publish('SKILL_STATUS', {
-      skillStatus: { status:event, agent:args[0], skill:args[1], data: JSON.stringify(args[2]) }
-    })
-  })
+  api.skills.any(
+    ['skillStarted', 'skillCompleted', 'skillNotFound', 'skillError'],
+    (event, ...args) => {
+      api.log.trace(
+        'Received a skill status event from system, sending to GraphQL subs',
+        event,
+        args
+      )
+      pubSub.publish('SKILL_STATUS', {
+        skillStatus: {
+          status: event,
+          agent: args[0],
+          skill: args[1],
+          data: JSON.stringify(args[2])
+        }
+      })
+    }
+  )
 }

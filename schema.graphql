@@ -65,7 +65,13 @@ type SkillStatus {
 type Mutation {
   sendMessage(message: String!, target: String!, source: String): Message
   createGroup(name: String!): String
-  createAgent(name: String!, driver: String!, description: String, instructions: String, skills: [String]): Agent
+  createAgent(
+    name: String!
+    driver: String!
+    description: String
+    instructions: String
+    skills: [String]
+  ): Agent
 }
 
 type Subscription {
