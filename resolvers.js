@@ -77,37 +77,37 @@ const Mutation = {
 const Subscription = {
   messageCreated: {
     subscribe: (_, __, { pubSub }) => {
-      return pubSub.asyncIterator(['MESSAGE_SENT'])
+      return pubSub.asyncIterableIterator(['MESSAGE_SENT'])
     }
   },
   messageUpdated: {
     subscribe: (_, __, { pubSub }) => {
-      return pubSub.asyncIterator(['MESSAGE_UPDATED'])
+      return pubSub.asyncIterableIterator(['MESSAGE_UPDATED'])
     }
   },
   groupCreated: {
     subscribe: (_, __, { pubSub }) => {
-      return pubSub.asyncIterator(['GROUP_CREATED'])
+      return pubSub.asyncIterableIterator(['GROUP_CREATED'])
     }
   },
   groupUpdated: {
     subscribe: (_, __, { pubSub }) => {
-      return pubSub.asyncIterator(['GROUP_UPDATED'])
+      return pubSub.asyncIterableIterator(['GROUP_UPDATED'])
     }
   },
   agentCreated: {
     subscribe: (_, __, { pubSub }) => {
-      return pubSub.asyncIterator(['AGENT_CREATED'])
+      return pubSub.asyncIterableIterator(['AGENT_CREATED'])
     }
   },
   agentUpdated: {
     subscribe: (_, __, { pubSub }) => {
-      return pubSub.asyncIterator(['AGENT_UPDATED'])
+      return pubSub.asyncIterableIterator(['AGENT_UPDATED'])
     }
   },
   skillStatus: {
     subscribe: (_, __, { pubSub }) => {
-      return pubSub.asyncIterator(['SKILL_STATUS'])
+      return pubSub.asyncIterableIterator(['SKILL_STATUS'])
     }
   }
 }
