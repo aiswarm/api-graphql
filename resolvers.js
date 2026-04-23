@@ -46,6 +46,10 @@ const Query = {
       })
     }
     return response
+  },
+  contextProviders: (parent, args, context) => {
+    context.api.log.trace('GraphQL Received Request for ContextProviders', args)
+    return context.api.contextProviders.list()
   }
 }
 
@@ -69,7 +73,8 @@ const Mutation = {
         type: args.driver
       },
       instructions: args.instructions,
-      skills: args.skills
+      skills: args.skills,
+      context: args.context
     })
   }
 }

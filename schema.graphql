@@ -4,10 +4,16 @@ type Query {
   groups: [Group]
   history(target: String, source: String): [Message]!
   skills: [Skill]
+  contextProviders: [ContextProvider]
 }
 
 type Skill {
   name: String!
+}
+
+type ContextProvider {
+  name: String!
+  dependsOn: [String!]!
 }
 
 type Agent {
@@ -23,6 +29,7 @@ type AgentConfig {
   description: String
   driver: DriverConfig!
   skills: [String]
+  context: [String]
 }
 
 type DriverConfig {
@@ -71,6 +78,7 @@ type Mutation {
     description: String
     instructions: String
     skills: [String]
+    context: [String]
   ): Agent
 }
 

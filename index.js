@@ -63,13 +63,8 @@ export async function initialize(api) {
   })
 
   // Start the server
-  app.listen({ port: config.port || 4000 }, (err, address) => {
-    if (err) {
-      api.log.error(err.message)
-      throw new Error(err.message)
-    }
-    api.log.info(`GraphQL endpoint available at ${address}`)
-  })
+  await app.listen({ port: config.port || 4000 })
+  api.log.info(`GraphQL endpoint available at http://localhost:${config.port || 4000}`)
 
   api.comms.on('all', msg => {
     api.log.trace('Received messageInput from system, sending to GraphQL subs', msg.toObject())
