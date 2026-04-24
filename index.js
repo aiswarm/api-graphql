@@ -108,6 +108,27 @@ export async function initialize(api) {
     })
   })
 
+  api.on('agentTurnCompleted', ({ agent, finalMessage, contextMetadata }) => {
+    api.log.trace(
+      'Received agentTurnCompleted event from system, sending to GraphQL subs',
+      agent?.name
+    )
+    pubSub.publish('AGENT_TURN_COMPLETED', {
+      agentTurnCompleted: {
+        agent,
+        finalMessage:
+          typeof finalMessage === 'string' ? finalMessage : (finalMessage?.content ?? null),
+        contextMetadata: contextMetadata
+          ? contextMetadata.map(entry => ({
+              name: entry.name,
+              error: entry.error ?? false,
+              metadata: flattenMetadata(entry.metadata)
+            }))
+          : null
+      }
+    })
+  })
+
   api.skills.any(
     ['skillStarted', 'skillCompleted', 'skillNotFound', 'skillError'],
     (event, ...args) => {
@@ -126,4 +147,19 @@ export async function initialize(api) {
       })
     }
   )
+}
+
+/**
+ * Flatten a free-form metadata object into the GraphQL [Metadata] key/value
+ * shape. Non-string values are JSON-stringified so the API can carry
+ * provider-specific structures without committing to a JSON scalar yet.
+ * @param {Object|null|undefined} metadata
+ * @return {Array<{key: string, value: string}>|null}
+ */
+function flattenMetadata(metadata) {
+  if (!metadata || typeof metadata !== 'object') return null
+  return Object.entries(metadata).map(([key, value]) => ({
+    key,
+    value: typeof value === 'string' ? value : JSON.stringify(value)
+  }))
 }

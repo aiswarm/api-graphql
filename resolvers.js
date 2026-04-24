@@ -110,6 +110,11 @@ const Subscription = {
       return pubSub.asyncIterableIterator(['AGENT_UPDATED'])
     }
   },
+  agentTurnCompleted: {
+    subscribe: (_, __, { pubSub }) => {
+      return pubSub.asyncIterableIterator(['AGENT_TURN_COMPLETED'])
+    }
+  },
   skillStatus: {
     subscribe: (_, __, { pubSub }) => {
       return pubSub.asyncIterableIterator(['SKILL_STATUS'])

@@ -61,6 +61,18 @@ type Metadata {
   value: String
 }
 
+type ContextMetadataEntry {
+  name: String!
+  metadata: [Metadata]
+  error: Boolean
+}
+
+type AgentTurn {
+  agent: Agent!
+  finalMessage: String
+  contextMetadata: [ContextMetadataEntry]
+}
+
 # Consider: adding a ststus field and combine skill subscriptions into one
 type SkillStatus {
   status: String!
@@ -89,5 +101,6 @@ type Subscription {
   groupUpdated: Group
   agentCreated: Agent
   agentUpdated: Agent
+  agentTurnCompleted: AgentTurn
   skillStatus: SkillStatus
 }
