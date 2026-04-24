@@ -20,7 +20,7 @@ type Agent {
   name: String!
   config: AgentConfig!
   driver: Driver!
-  status: String!
+  status: String
 }
 
 type AgentConfig {
