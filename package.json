@@ -28,11 +28,9 @@
   "author": "Ravi Gairola <mallox@pyxzl.net>",
   "license": "MIT",
   "dependencies": {
-    "@graphql-tools/schema": "^10.0.0",
-    "fastify": "^5.8.5",
     "@fastify/cors": "^11.2.0",
+    "fastify": "^5.8.5",
     "graphql": "^16.8.1",
-    "graphql-tag": "^2.12.6",
     "graphql-subscriptions": "^3.0.0",
     "mercurius": "^16.9.0"
   },
@@ -44,7 +42,7 @@
     "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.0",
     "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-import-x": "^4.16.2",
     "globals": "^17.0.0",
     "husky": "^9.1.0",
     "lint-staged": "^16.0.0",

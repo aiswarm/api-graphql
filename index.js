@@ -8,9 +8,7 @@ import { fileURLToPath } from 'url'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import { mercurius } from 'mercurius'
-import { makeExecutableSchema } from '@graphql-tools/schema'
 import { PubSub } from 'graphql-subscriptions'
-import { gql } from 'graphql-tag'
 import resolvers from './resolvers.js'
 
 /**
@@ -41,17 +39,14 @@ export async function initialize(api) {
   const __filename = fileURLToPath(import.meta.url)
   const __dirname = path.dirname(__filename)
   const schemaPath = path.join(__dirname, 'schema.graphql')
-  const typeDefs = gql(await fs.promises.readFile(schemaPath, 'utf8'))
+  const typeDefs = await fs.promises.readFile(schemaPath, 'utf8')
 
   const app = Fastify()
   app.register(cors)
-  const schema = makeExecutableSchema({
-    typeDefs,
-    resolvers
-  })
 
   app.register(mercurius, {
-    schema,
+    schema: typeDefs,
+    resolvers,
     context: () => {
       return { api, pubSub: pubSub }
     },
