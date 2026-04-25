@@ -90,6 +90,11 @@ const Subscription = {
       return pubSub.asyncIterableIterator(['MESSAGE_UPDATED'])
     }
   },
+  messageAppended: {
+    subscribe: (_, __, { pubSub }) => {
+      return pubSub.asyncIterableIterator(['MESSAGE_APPENDED'])
+    }
+  },
   groupCreated: {
     subscribe: (_, __, { pubSub }) => {
       return pubSub.asyncIterableIterator(['GROUP_CREATED'])

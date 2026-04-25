@@ -61,6 +61,11 @@ type Metadata {
   value: String
 }
 
+type MessageDelta {
+  id: Float!
+  delta: String!
+}
+
 type ContextMetadataEntry {
   name: String!
   metadata: [Metadata]
@@ -97,6 +102,7 @@ type Mutation {
 type Subscription {
   messageCreated: Message
   messageUpdated: Message
+  messageAppended: MessageDelta
   groupCreated: Group
   groupUpdated: Group
   agentCreated: Agent

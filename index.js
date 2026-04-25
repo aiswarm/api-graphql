@@ -80,6 +80,17 @@ export async function initialize(api) {
     })
   })
 
+  api.on('messageAppended', (msg, delta) => {
+    api.log.trace(
+      'Received messageAppended from system, sending to GraphQL subs',
+      msg.id,
+      delta.length
+    )
+    pubSub.publish('MESSAGE_APPENDED', {
+      messageAppended: { id: msg.id, delta }
+    })
+  })
+
   api.groups.on('created', (name, members) => {
     api.log.trace('Received groupCreated event from system, sending to GraphQL subs', name)
     pubSub.publish('GROUP_CREATED', {
